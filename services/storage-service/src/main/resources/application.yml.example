@@ -1,0 +1,22 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: storage-service
+
+  storage:
+    s3:
+      access-key: access-key
+      secret-key: secret-key
+      endpoint: https://storage.yandexcloud.net
+      region: ru-central1
+      bucket: clouddatastorage
+
+  grpc:
+    server:
+      port: 9090
+
+jwt:
+  key: "SUPER-SECRET-KEY-VERY-SECRET-DONT-USE-IN-PROD"
+  header: "Authorization"
