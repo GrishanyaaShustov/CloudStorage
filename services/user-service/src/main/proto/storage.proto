@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package storage;
+
+option java_multiple_files = true;
+option java_package = "cloud.storage.grpc";
+option java_outer_classname = "StorageProto";
+
+// ==================== Upload ====================
+message UploadFileRequest {
+  string key = 1;
+  bytes fileData = 2;
+  string contentType = 3;
+}
+
+message UploadFileResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// ==================== Delete ====================
+message DeleteFileRequest {
+  string key = 1;
+}
+
+message DeleteFileResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// ==================== Copy ====================
+message CopyFileRequest {
+  string key = 1;
+  string destinationKey = 2;
+}
+
+message CopyFileResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// ==================== Download ====================
+message DownloadFileRequest {
+  string key = 1;
+}
+
+message DownloadFileResponse {
+  bool success = 1;
+  string message = 2;
+  bytes fileData = 3; // здесь содержимое файла
+}
+
+// ==================== Сервис ====================
+service StorageService {
+  rpc UploadFile(UploadFileRequest) returns (UploadFileResponse);
+  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
+  rpc CopyFile(CopyFileRequest) returns (CopyFileResponse);
+  rpc DownloadFile(DownloadFileRequest) returns (DownloadFileResponse);
+}
