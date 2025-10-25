@@ -1,4 +1,59 @@
 package cloud.storage.userservice.services;
 
-public class FileServiceImplementation {
+import cloud.storage.userservice.DTO.requests.fileRequests.*;
+import cloud.storage.userservice.DTO.responses.fileResponses.*;
+import cloud.storage.userservice.configuration.GrpcServerProperties;
+import cloud.storage.userservice.configuration.JwtClientInterceptor;
+import cloud.storage.userservice.repository.FolderRepository;
+import cloud.storage.userservice.repository.UserRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.security.Principal;
+
+@Service
+@AllArgsConstructor
+public class FileServiceImplementation implements FileService{
+
+    private final UserRepository userRepository;
+    private final FolderRepository folderRepository;
+
+    private final JwtClientInterceptor jwtClientInterceptor;
+    private final GrpcServerProperties grpcServerProperties;
+
+
+    @Override
+    public UploadFileResponse uploadFile(UploadFileRequest request, Principal principal) throws SecurityException {
+        return null;
+    }
+
+    @Override
+    public CopyFileResponse copyFile(CopyFileRequest request, Principal principal) throws SecurityException {
+        return null;
+    }
+
+    @Override
+    public ReplaceFileResponse replaceFile(ReplaceFileRequest request, Principal principal) throws SecurityException {
+        return null;
+    }
+
+    @Override
+    public DeleteFileResponse deleteFile(DeleteFileRequest request, Principal principal) throws SecurityException {
+        return null;
+    }
+
+    @Override
+    public GetFilesInDirectoryResponse getFilesInDirectory(GetFilesInDirectoryRequest request, Principal principal) throws SecurityException {
+        return null;
+    }
+
+    @Override
+    public DownloadFileResponse downloadFile(DownloadFileRequest request, Principal principal) throws SecurityException {
+        return null;
+    }
+
+    @Override
+    public RenameFileResponse renameFile(RenameFileRequest request, Principal principal) throws SecurityException {
+        return null;
+    }
 }

@@ -25,3 +25,8 @@ spring:
 jwt:
   key: "SUPER-VERY-SECRET-KEY-VERY-SECRET-VERY-VERY"
   header: "Authorization"
+
+grpc:
+  storage:
+    host: localhost
+    port: 9090

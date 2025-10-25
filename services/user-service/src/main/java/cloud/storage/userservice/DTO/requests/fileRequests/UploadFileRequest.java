@@ -1,14 +1,12 @@
 package cloud.storage.userservice.DTO.requests.fileRequests;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
-@Builder
+@AllArgsConstructor
 public class UploadFileRequest {
-    private String fileName;
+    private MultipartFile file;
     private Long folderId;
-    private String contentType;
-    private long size;
-    private java.io.InputStream fileStream;
 }
