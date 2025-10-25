@@ -6,13 +6,17 @@ option java_multiple_files = true;
 option java_package = "cloud.storage.grpc";
 option java_outer_classname = "StorageProto";
 
-// ==================== Upload ====================
+// ==================== Upload (streaming) ====================
+// Клиент отправляет файл частями (чанками)
 message UploadFileRequest {
-  string key = 1;
-  bytes fileData = 2;
-  string contentType = 3;
+  string key = 1;           // Имя / ключ файла в S3
+  string contentType = 2;   // MIME тип (например, "image/png")
+  bytes chunkData = 3;      // Данные файла (часть)
+  int64 chunkIndex = 4;     // Номер чанка (0, 1, 2, ...)
+  bool isLastChunk = 5;     // true, если это последний чанк
 }
 
+// Ответ после завершения загрузки
 message UploadFileResponse {
   bool success = 1;
   string message = 2;
@@ -39,21 +43,26 @@ message CopyFileResponse {
   string message = 2;
 }
 
-// ==================== Download ====================
+// ==================== Download (streaming) ====================
+// Сервер отдает файл тоже чанками
 message DownloadFileRequest {
   string key = 1;
 }
 
 message DownloadFileResponse {
-  bool success = 1;
-  string message = 2;
-  bytes fileData = 3; // здесь содержимое файла
+  bytes chunkData = 1;      // Часть файла
+  int64 chunkIndex = 2;     // Номер чанка
+  bool isLastChunk = 3;     // true, если последний
 }
 
 // ==================== Сервис ====================
 service StorageService {
-  rpc UploadFile(UploadFileRequest) returns (UploadFileResponse);
+  // Клиент отправляет поток чанков, сервер отвечает один раз после загрузки
+  rpc UploadFile(stream UploadFileRequest) returns (UploadFileResponse);
+
   rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
   rpc CopyFile(CopyFileRequest) returns (CopyFileResponse);
-  rpc DownloadFile(DownloadFileRequest) returns (DownloadFileResponse);
+
+  // Сервер отдает поток чанков
+  rpc DownloadFile(DownloadFileRequest) returns (stream DownloadFileResponse);
 }
