@@ -22,7 +22,7 @@ public class FileController {
     private final FileService fileService;
 
     @PostMapping("/upload")
-    public ResponseEntity<UploadFileResponse> uploadFile(@RequestParam MultipartFile file, @RequestParam Long folderId, Principal principal) {
+    public ResponseEntity<UploadFileResponse> uploadFile(@RequestParam MultipartFile file, @RequestParam(value = "folderId", required = false) Long folderId, Principal principal) {
         try {
             return ResponseEntity.ok(fileService.uploadFile(new UploadFileRequest(file, folderId), principal));
         } catch (Exception e) {

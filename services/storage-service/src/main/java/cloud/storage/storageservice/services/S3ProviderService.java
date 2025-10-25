@@ -1,5 +1,6 @@
 package cloud.storage.storageservice.services;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 public interface S3ProviderService {
@@ -11,4 +12,6 @@ public interface S3ProviderService {
     void deleteFile(String key);
 
     void copyFile(String key, String destinationKey);
+
+    void uploadFileInParts(String key, InputStream inputStream, String contentType) throws IOException;
 }
