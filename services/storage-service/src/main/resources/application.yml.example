@@ -5,6 +5,11 @@ spring:
   application:
     name: storage-service
 
+  grpc:
+    server:
+      port: 9090
+      max-inbound-message-size: 209715200
+
   storage:
     s3:
       access-key: access-key
@@ -12,10 +17,6 @@ spring:
       endpoint: https://storage.yandexcloud.net
       region: ru-central1
       bucket: clouddatastorage
-
-  grpc:
-    server:
-      port: 9090
 
 jwt:
   key: "SUPER-SECRET-KEY-VERY-SECRET-DONT-USE-IN-PROD"
