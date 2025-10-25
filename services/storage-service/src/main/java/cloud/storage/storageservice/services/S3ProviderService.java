@@ -15,5 +15,4 @@ public interface S3ProviderService {
     void copyFile(String key, String destinationKey);
 
     void uploadFileByChunks(String key, String contentType, List<byte[]> chunks) throws IOException;
-
 }
