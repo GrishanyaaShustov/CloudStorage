@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "grpc.storage")
+@ConfigurationProperties(prefix = "spring.grpc.server")
 @Getter
 @Setter
 public class GrpcServerProperties {
