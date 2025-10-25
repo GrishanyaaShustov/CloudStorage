@@ -26,7 +26,7 @@ public class FileController {
         try {
             return ResponseEntity.ok(fileService.uploadFile(new UploadFileRequest(file, folderId), principal));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new UploadFileResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new UploadFileResponse(e.getMessage(), false));
         }
     }
 }

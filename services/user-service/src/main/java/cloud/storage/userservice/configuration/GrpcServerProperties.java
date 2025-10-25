@@ -11,9 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class GrpcServerProperties {
     private String host;
-    private String port;
+    private Integer port;
 
-    public String getAddress(){
-        return this.host + ":" + this.port;
-    }
+
 }

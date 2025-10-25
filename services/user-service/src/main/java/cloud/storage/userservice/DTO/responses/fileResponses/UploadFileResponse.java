@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+@Builder
 @Data
 @AllArgsConstructor
-@Builder
 public class UploadFileResponse {
-    private  String message;
+    private String message;
+    private boolean isSuccess;
 }
