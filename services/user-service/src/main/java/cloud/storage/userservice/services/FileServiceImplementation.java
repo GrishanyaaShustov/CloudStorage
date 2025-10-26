@@ -93,7 +93,7 @@ public class FileServiceImplementation implements FileService {
 
     private UploadFileResponse sendFileToStorageService(MultipartFile file, String key) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(grpcServerProperties.getHost(), grpcServerProperties.getPort())
+                .forAddress(grpcServerProperties.getHost(), grpcServerProperties.getPort()) //localhost:9090
                 .intercept(jwtClientInterceptor)
                 .usePlaintext()
                 .build();
