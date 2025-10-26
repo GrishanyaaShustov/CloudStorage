@@ -9,13 +9,10 @@ import cloud.storage.userservice.models.File;
 import cloud.storage.userservice.models.Folder;
 import cloud.storage.userservice.models.User;
 import cloud.storage.userservice.repository.FileRepository;
-import cloud.storage.userservice.repository.FolderRepository;
-import cloud.storage.userservice.repository.UserRepository;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.security.Principal;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +38,7 @@ public class FileServiceImplementation implements FileService {
     @Override
     @Transactional
     public UploadFileResponse uploadFile(UploadFileRequest request, Principal principal) throws SecurityException {
+        helperService.validateFileNotEmpty(request.getFile());
         User user = helperService.validateAndGetUser(principal);
         Folder folder = helperService.validateAndGetFolder(request.getFolderId(), user);
         helperService.validateFileNameUniqueness(request.getFile().getOriginalFilename(), folder, user);
@@ -61,7 +58,7 @@ public class FileServiceImplementation implements FileService {
                     .s3Key(key)
                     .build());
         }
-        return grpcResponse != null ? grpcResponse : new UploadFileResponse("Somthing went wrong with file upload", false);
+        return grpcResponse != null ? grpcResponse : new UploadFileResponse("Something went wrong with file upload", false);
     }
 
     @Override
@@ -130,7 +127,7 @@ public class FileServiceImplementation implements FileService {
         StreamObserver<cloud.storage.grpc.UploadFileRequest> requestObserver = asyncStub.uploadFile(responseObserver);
 
         try (InputStream inputStream = file.getInputStream()) {
-            byte[] buffer = new byte[1024 * 1024 * 50]; // 50 MB
+            byte[] buffer = new byte[1024 * 1024 * 25]; // 25 MB
             int bytesRead;
             int chunkIndex = 0;
 

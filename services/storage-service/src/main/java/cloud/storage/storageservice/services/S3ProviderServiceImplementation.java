@@ -65,7 +65,7 @@ public class S3ProviderServiceImplementation implements S3ProviderService {
     // ---------- загрузка по частям ----------
     @Override
     public void uploadFileInParts(String key, InputStream inputStream, String contentType) throws IOException {
-        final long partSize = 50L * 1024 * 1024; // 50 MB
+        final long partSize = 25L * 1024 * 1024; // 25 MB
         String bucket = s3Configuration.getBucket();
 
         CreateMultipartUploadRequest createRequest = CreateMultipartUploadRequest.builder()
