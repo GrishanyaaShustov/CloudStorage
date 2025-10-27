@@ -1,8 +1,10 @@
 package cloud.storage.fileservice.services;
 
 import cloud.storage.fileservice.dto.requests.DeleteFileRequest;
+import cloud.storage.fileservice.dto.requests.GetFilesInDirectoryRequest;
 import cloud.storage.fileservice.dto.requests.UploadFileRequest;
 import cloud.storage.fileservice.dto.responses.DeleteFileResponse;
+import cloud.storage.fileservice.dto.responses.GetFilesInDirectoryResponse;
 import cloud.storage.fileservice.dto.responses.UploadFileResponse;
 import cloud.storage.fileservice.models.Folder;
 import cloud.storage.fileservice.models.User;
@@ -23,6 +25,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.Principal;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -84,6 +88,17 @@ public class FileServiceImpl implements FileService {
         fileRepository.delete(file);
         s3Service.deleteFile(file.getS3Key());
         return new DeleteFileResponse(true, "File delete successfully");
+    }
+
+    @Override
+    public GetFilesInDirectoryResponse getFiles(GetFilesInDirectoryRequest request, Principal principal) throws SecurityException {
+        User user = helperService.validateAndGetUser(principal);
+        Folder folder = helperService.validateAndGetFolder(user, request.getFolderId());
+        Map<String, Long> fileMap = fileRepository.findFilesByFolder(folder)
+                .stream()
+                .collect(Collectors.toMap(cloud.storage.fileservice.models.File::getName, cloud.storage.fileservice.models.File::getId));
+
+        return new GetFilesInDirectoryResponse(fileMap, "Received all files in directory id: " + (request.getFolderId() == null ? "root" : request.getFolderId()));
     }
 
     private Mono<Void> uploadFileAsync(String s3Key, File file, String contentType) throws Exception {
