@@ -1,0 +1,39 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: file-service
+
+  storage:
+    s3:
+      access-key: access
+      secret-key: secret
+      endpoint: https://storage.yandexcloud.net
+      region: ru-central1
+      bucket: clouddatastorage
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://host:5432/postgres
+    username: username
+    password: password
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  servlet:
+    multipart:
+      max-file-size: 1000MB
+      max-request-size: 1000MB
+
+jwt:
+  key: "SEEEEEEEEEEEEEEEEEECREEEEEEEEEEEEEEEEEET"
+  header: "Authorization"
