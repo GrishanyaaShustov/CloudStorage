@@ -1,5 +1,6 @@
 package cloud.storage.fileservice.services;
 
+import cloud.storage.fileservice.models.File;
 import cloud.storage.fileservice.models.Folder;
 import cloud.storage.fileservice.models.User;
 import cloud.storage.fileservice.repository.FileRepository;
@@ -30,6 +31,12 @@ public class HelperService {
             if(!folder.getUser().getId().equals(user.getId())) throw new SecurityException("401.Access denied");
         }
         return folder;
+    }
+
+    public File validateAndGetFile(User user, Long fileId) throws IllegalArgumentException, SecurityException{
+        File file = fileRepository.findFileById(fileId).orElseThrow(() -> new IllegalArgumentException("404.File with that id does not exist"));
+        if(!file.getUser().getId().equals(user.getId())) throw new SecurityException("401.Access denied");
+        return file;
     }
 
     public void validateFileNameUniq(User user, Folder folder, String fileName) throws IllegalArgumentException{

@@ -1,11 +1,14 @@
 package cloud.storage.fileservice.services;
 
+import cloud.storage.fileservice.dto.requests.DeleteFileRequest;
 import cloud.storage.fileservice.dto.requests.UploadFileRequest;
+import cloud.storage.fileservice.dto.responses.DeleteFileResponse;
 import cloud.storage.fileservice.dto.responses.UploadFileResponse;
 import cloud.storage.fileservice.models.Folder;
 import cloud.storage.fileservice.models.User;
 import cloud.storage.fileservice.repository.FileRepository;
 import cloud.storage.fileservice.services.S3Services.S3AsyncService;
+import cloud.storage.fileservice.services.S3Services.S3Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -29,6 +32,7 @@ public class FileServiceImpl implements FileService {
 
     private final HelperService helperService;
     private final S3AsyncService s3AsyncService;
+    private final S3Service s3Service;
 
     private final FileRepository fileRepository;
 
@@ -70,6 +74,16 @@ public class FileServiceImpl implements FileService {
         }
 
         return new UploadFileResponse(true);
+    }
+
+    @Override
+    @Transactional
+    public DeleteFileResponse deleteFile(DeleteFileRequest request, Principal principal){
+        User user = helperService.validateAndGetUser(principal);
+        cloud.storage.fileservice.models.File file = helperService.validateAndGetFile(user, request.getFileId());
+        fileRepository.delete(file);
+        s3Service.deleteFile(file.getS3Key());
+        return new DeleteFileResponse(true, "File delete successfully");
     }
 
     private Mono<Void> uploadFileAsync(String s3Key, File file, String contentType) throws Exception {
