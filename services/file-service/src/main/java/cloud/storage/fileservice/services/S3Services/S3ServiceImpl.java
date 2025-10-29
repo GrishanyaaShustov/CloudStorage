@@ -5,11 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.*;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +56,6 @@ public class S3ServiceImpl implements S3Service{
                 .bucket(s3Configuration.getBucket())
                 .key(key)
                 .build();
-        return s3Client.getObject(getObjectRequest);
+        return s3Client.getObject(getObjectRequest); // возвращает ResponseInputStream<GetObjectResponse>
     }
 }

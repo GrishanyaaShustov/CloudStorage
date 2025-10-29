@@ -15,8 +15,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
@@ -24,6 +26,8 @@ import reactor.core.publisher.Mono;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -99,6 +103,25 @@ public class FileServiceImpl implements FileService {
                 .collect(Collectors.toMap(cloud.storage.fileservice.models.File::getName, cloud.storage.fileservice.models.File::getId));
 
         return new GetFilesInDirectoryResponse(fileMap, "Received all files in directory id: " + (request.getFolderId() == null ? "root" : request.getFolderId()));
+    }
+
+    @Override
+    public ResponseEntity<InputStreamResource> downloadFileResponse(Long fileId, Principal principal) {
+        User user = helperService.validateAndGetUser(principal);
+        cloud.storage.fileservice.models.File file = helperService.validateAndGetFile(user, fileId);
+
+        log.info("Начинается скачивание файла {} пользователем {}", file.getName(), user.getEmail());
+
+        InputStreamResource resource = new InputStreamResource(s3Service.downloadFile(file.getS3Key()));
+
+        String encodedFilename = URLEncoder.encode(file.getName(), StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFilename)
+                .header("Content-Type", file.getContentType() != null ? file.getContentType() : "application/octet-stream")
+                .contentLength(file.getSize())
+                .body(resource);
     }
 
     private Mono<Void> uploadFileAsync(String s3Key, File file, String contentType) throws Exception {
