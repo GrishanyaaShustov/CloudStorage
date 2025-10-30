@@ -3,9 +3,11 @@ package cloud.storage.fileservice.services;
 import cloud.storage.fileservice.customExceptions.S3UploadException;
 import cloud.storage.fileservice.dto.requests.DeleteFileRequest;
 import cloud.storage.fileservice.dto.requests.GetFilesInDirectoryRequest;
+import cloud.storage.fileservice.dto.requests.MoveFileRequest;
 import cloud.storage.fileservice.dto.requests.UploadFileRequest;
 import cloud.storage.fileservice.dto.responses.DeleteFileResponse;
 import cloud.storage.fileservice.dto.responses.GetFilesInDirectoryResponse;
+import cloud.storage.fileservice.dto.responses.MoveFileResponse;
 import cloud.storage.fileservice.dto.responses.UploadFileResponse;
 import cloud.storage.fileservice.models.Folder;
 import cloud.storage.fileservice.models.User;
@@ -105,6 +107,17 @@ public class FileServiceImpl implements FileService {
                 .collect(Collectors.toMap(cloud.storage.fileservice.models.File::getName, cloud.storage.fileservice.models.File::getId));
 
         return new GetFilesInDirectoryResponse(fileMap, "Received all files in directory id: " + (request.getFolderId() == null ? "root" : request.getFolderId()));
+    }
+
+    @Override
+    public MoveFileResponse moveFile(MoveFileRequest request, Principal principal) {
+        User user = helperService.validateAndGetUser(principal);
+        Folder targetFolder = helperService.validateAndGetFolder(user, request.getFolderId());
+        cloud.storage.fileservice.models.File file = helperService.validateAndGetFile(user, request.getFileId());
+        helperService.validateFileNameUniq(user, targetFolder, file.getName());
+        file.setFolder(targetFolder);
+        fileRepository.save(file);
+        return new MoveFileResponse("File moved to folder id: " + targetFolder.getId());
     }
 
     @Override

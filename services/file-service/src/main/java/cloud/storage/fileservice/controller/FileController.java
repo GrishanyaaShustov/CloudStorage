@@ -2,9 +2,11 @@ package cloud.storage.fileservice.controller;
 
 import cloud.storage.fileservice.dto.requests.DeleteFileRequest;
 import cloud.storage.fileservice.dto.requests.GetFilesInDirectoryRequest;
+import cloud.storage.fileservice.dto.requests.MoveFileRequest;
 import cloud.storage.fileservice.dto.requests.UploadFileRequest;
 import cloud.storage.fileservice.dto.responses.DeleteFileResponse;
 import cloud.storage.fileservice.dto.responses.GetFilesInDirectoryResponse;
+import cloud.storage.fileservice.dto.responses.MoveFileResponse;
 import cloud.storage.fileservice.dto.responses.UploadFileResponse;
 import cloud.storage.fileservice.services.FileService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,18 @@ public class FileController {
     ) {
         log.info("Запрос на загрузку файла пользователем {}", principal.getName());
         return ResponseEntity.ok(fileService.uploadFile(new UploadFileRequest(file, folderId), principal));
+    }
+
+    /**
+     * Перемещение файла в другую папку
+     */
+    @PatchMapping("/move")
+    public ResponseEntity<MoveFileResponse> moveFile(
+            @RequestBody MoveFileRequest request,
+            Principal principal
+    ){
+       log.info("Запрос на перемещение файла пользователем {}", principal.getName());
+       return ResponseEntity.ok(fileService.moveFile(request, principal));
     }
 
     /**
