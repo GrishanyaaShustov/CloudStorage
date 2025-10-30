@@ -104,6 +104,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional
     public MoveFileResponse moveFile(MoveFileRequest request, Principal principal) {
         User user = helperService.validateAndGetUser(principal);
         Folder targetFolder = helperService.validateAndGetFolder(user, request.getFolderId());
@@ -115,6 +116,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional
     public RenameFileResponse renameFile(RenameFileRequest request, Principal principal) {
         User user = helperService.validateAndGetUser(principal);
         cloud.storage.fileservice.models.File file = helperService.validateAndGetFile(user, request.getFileId());
@@ -149,6 +151,27 @@ public class FileServiceImpl implements FileService {
 
         fileRepository.save(file);
         return new RenameFileResponse("File renamed successfully");
+    }
+
+    @Override
+    @Transactional
+    public CopyFileResponse copyFile(CopyFileRequest request, Principal principal) {
+        User user = helperService.validateAndGetUser(principal);
+        Folder targetFolder = helperService.validateAndGetFolder(user, request.getTargetFolderId());
+        cloud.storage.fileservice.models.File file = helperService.validateAndGetFile(user, request.getFileId());
+        helperService.validateFileNameUniq(user, targetFolder, file.getName());
+        String copyS3Key = helperService.generateS3Key(file.getName());
+        s3Service.copyFile(file.getS3Key(), copyS3Key);
+        cloud.storage.fileservice.models.File copiedFile = cloud.storage.fileservice.models.File.builder()
+                .user(user)
+                .name(file.getName())
+                .s3Key(copyS3Key)
+                .folder(targetFolder)
+                .contentType(file.getContentType())
+                .size(file.getSize())
+                .build();
+        fileRepository.save(copiedFile);
+        return new CopyFileResponse("File copied successfully");
     }
 
     @Override

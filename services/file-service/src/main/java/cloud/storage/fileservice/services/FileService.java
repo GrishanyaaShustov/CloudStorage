@@ -13,5 +13,6 @@ public interface FileService {
     GetFilesInDirectoryResponse getFiles(GetFilesInDirectoryRequest request, Principal principal);
     MoveFileResponse moveFile(MoveFileRequest request, Principal principal);
     RenameFileResponse renameFile(RenameFileRequest request, Principal principal);
+    CopyFileResponse copyFile(CopyFileRequest request, Principal principal);
     ResponseEntity<InputStreamResource> downloadFileResponse(Long fileId, Principal principal);
 }

@@ -36,6 +36,18 @@ public class FileController {
     }
 
     /**
+     * Копирование файла
+     */
+    @PostMapping("/copy")
+    public ResponseEntity<CopyFileResponse> copyFile(
+            @RequestBody CopyFileRequest request,
+            Principal principal
+    ){
+        log.info("Запрос на копирование файла пользователем {}", principal.getName());
+        return ResponseEntity.ok(fileService.copyFile(request, principal));
+    }
+
+    /**
      * Перемещение файла в другую папку
      */
     @PatchMapping("/move")
