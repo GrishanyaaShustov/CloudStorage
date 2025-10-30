@@ -1,4 +1,4 @@
-package cloud.storage.authservice.controllers;
+package cloud.storage.authservice.controller;
 
 import cloud.storage.authservice.dto.requests.SignUpRequest;
 import cloud.storage.authservice.dto.requests.SingInRequest;
@@ -19,21 +19,25 @@ public class AuthController {
 
     private final AuthService authService;
 
+    /**
+     * Вход
+     */
     @PostMapping("/signin")
-    public ResponseEntity<SignInResponse> signIn(@RequestBody SingInRequest request){
-        try{
-            return ResponseEntity.ok(authService.signIn(request));
-        } catch (Exception e){
-            return ResponseEntity.status(Integer.parseInt(e.getMessage().split("\\.")[0])).body(new SignInResponse(null));
-        }
+    public ResponseEntity<SignInResponse> signIn(
+            @RequestBody SingInRequest request
+    )
+    {
+        return ResponseEntity.ok(authService.signIn(request));
     }
 
+    /**
+     * Регистрация
+     */
     @PostMapping("/signup")
-    public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest request){
-        try {
-            return ResponseEntity.ok(authService.signUp(request));
-        } catch (Exception e){
-            return ResponseEntity.status(Integer.parseInt(e.getMessage().split("\\.")[0])).body(new SignUpResponse(e.getMessage().split("\\.")[1]));
-        }
+    public ResponseEntity<SignUpResponse> signUp(
+            @RequestBody SignUpRequest request
+    )
+    {
+        return ResponseEntity.ok(authService.signUp(request));
     }
 }

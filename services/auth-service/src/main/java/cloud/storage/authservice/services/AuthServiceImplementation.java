@@ -1,5 +1,6 @@
 package cloud.storage.authservice.services;
 
+import cloud.storage.authservice.customExceptions.*;
 import cloud.storage.authservice.dto.requests.SignUpRequest;
 import cloud.storage.authservice.dto.requests.SingInRequest;
 import cloud.storage.authservice.dto.responses.SignInResponse;
@@ -34,19 +35,15 @@ public class AuthServiceImplementation implements AuthService{
     @Transactional
     @Override
     public SignUpResponse signUp(SignUpRequest request) {
-        log.debug("Processing sign-up request for username: {}", request.getUsername());
 
         if(userRepository.existsByUsername(request.getUsername())) {
-            log.warn("Sign-up failed: username '{}' already exists", request.getUsername());
-            throw new IllegalArgumentException("409.User with this username already exist");
+            throw new UserAlreadyExistsException("User with this username already exists");
         }
         if(userRepository.existsByEmail(request.getEmail())) {
-            log.warn("Sign-up failed: email '{}' already exists", request.getEmail());
-            throw new IllegalArgumentException("409.User with this email already exist");
+            throw new UserAlreadyExistsException("User with this email already exists");
         }
         if(!request.getPassword().equals(request.getCheckPassword())) {
-            log.warn("Sign-up failed: passwords do not match for username '{}'", request.getUsername());
-            throw new IllegalArgumentException("400.Passwords must be the same");
+            throw new PasswordMismatchException("Passwords must be the same");
         }
 
         String hashedPassword = passwordEncoder.encode(request.getPassword());
@@ -72,8 +69,9 @@ public class AuthServiceImplementation implements AuthService{
             log.info("User authenticated successfully: email={}", request.getEmail());
             return new SignInResponse(jwt);
         } catch (BadCredentialsException e){
-            log.warn("Failed authentication attempt for email: {}", request.getEmail());
-            throw new BadCredentialsException("401.Invalid credentials");
+            throw new InvalidCredentialsException("Invalid email or password");
+        } catch (Exception e){
+            throw new TokenGenerationException("Failed to generate JWT token", e);
         }
     }
 }
