@@ -1,14 +1,15 @@
 package cloud.storage.fileservice.services;
 
+import cloud.storage.fileservice.configuration.CustomUserPrincipal;
 import cloud.storage.fileservice.customExceptions.*;
 import cloud.storage.fileservice.models.File;
 import cloud.storage.fileservice.models.Folder;
 import cloud.storage.fileservice.models.User;
 import cloud.storage.fileservice.repository.FileRepository;
-import cloud.storage.fileservice.repository.UserRepository;
 import cloud.storage.fileservice.repository.FolderRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.tika.Tika;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,15 +20,20 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class HelperService {
 
-    private final UserRepository userRepository;
     private final FolderRepository folderRepository;
     private final FileRepository fileRepository;
 
     private final Tika tika = new Tika();
 
     public User validateAndGetUser(Principal principal) {
-        return userRepository.findUserByEmail(principal.getName())
-                .orElseThrow(() -> new UserNotFoundException("User does not exist"));
+        if (principal instanceof UsernamePasswordAuthenticationToken token &&
+                token.getPrincipal() instanceof CustomUserPrincipal userPrincipal) {
+            return User.builder()
+                    .id(userPrincipal.getId())
+                    .email(userPrincipal.getEmail())
+                    .build();
+        }
+        throw new AccessDeniedException("Invalid authentication principal");
     }
 
     public Folder validateAndGetFolder(User user, Long folderId) {

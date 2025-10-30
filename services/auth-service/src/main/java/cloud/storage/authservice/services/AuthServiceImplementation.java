@@ -65,12 +65,16 @@ public class AuthServiceImplementation implements AuthService{
         try{
             auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(auth);
-            String jwt = jwtProvider.generateToken(auth);
+            User user = userRepository.findUserByEmail(request.getEmail())
+                    .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.getEmail()));
+            String jwt = jwtProvider.generateToken(auth, user.getId());
             log.info("User authenticated successfully: email={}", request.getEmail());
             return new SignInResponse(jwt);
-        } catch (BadCredentialsException e){
+        } catch (BadCredentialsException e) {
             throw new InvalidCredentialsException("Invalid email or password");
-        } catch (Exception e){
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
             throw new TokenGenerationException("Failed to generate JWT token", e);
         }
     }
