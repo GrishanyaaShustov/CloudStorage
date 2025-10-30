@@ -1,5 +1,6 @@
 package cloud.storage.fileservice.services;
 
+import cloud.storage.fileservice.customExceptions.S3UploadException;
 import cloud.storage.fileservice.dto.requests.DeleteFileRequest;
 import cloud.storage.fileservice.dto.requests.GetFilesInDirectoryRequest;
 import cloud.storage.fileservice.dto.requests.UploadFileRequest;
@@ -50,35 +51,36 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public UploadFileResponse uploadFile(UploadFileRequest request, Principal principal) {
+        MultipartFile file = request.getFile();
+        helperService.validateFileNotEmpty(file);
         User user = helperService.validateAndGetUser(principal);
         Folder folder = helperService.validateAndGetFolder(user, request.getFolderId());
-        helperService.validateFileNameUniq(user, folder, request.getFile().getOriginalFilename());
-        String s3Key = helperService.generateS3Key(request.getFile().getOriginalFilename());
-        MultipartFile file = request.getFile();
+        helperService.validateFileNameUniq(user, folder, file.getOriginalFilename());
+        String s3Key = helperService.generateS3Key(file.getOriginalFilename());
 
         try {
             fileRepository.save(cloud.storage.fileservice.models.File.builder()
-                    .name(request.getFile().getOriginalFilename())
+                    .name(file.getOriginalFilename())
                     .s3Key(s3Key)
-                    .size(request.getFile().getSize())
-                    .contentType(request.getFile().getContentType())
+                    .size(file.getSize())
+                    .contentType(file.getContentType())
                     .user(user)
                     .folder(folder)
                     .build());
 
-            // Создаем временный файл, чтобы он не удалился до окончания загрузки
+            // Создаем временный файл
             File tempFile = File.createTempFile("upload-", ".tmp");
             file.transferTo(tempFile);
 
-            // Запускаем асинхронную загрузку в фоне
+            // Асинхронная загрузка в фоне
             uploadFileAsync(s3Key, tempFile, file.getContentType())
-                    .doFinally(signal -> tempFile.delete()) // удаляем temp файл после загрузки
+                    .doFinally(signal -> tempFile.delete())
                     .doOnError(e -> log.error("Ошибка при загрузке файла в S3: {}", e.getMessage()))
                     .block();
 
         } catch (Exception e) {
-            log.error("Ошибка при подготовке файла для загрузки в S3: {}", e.getMessage());
-            throw new RuntimeException("Ошибка при загрузке файла", e);
+            log.error("Ошибка при подготовке файла для загрузки в S3: {}", e.getMessage(), e);
+            throw new S3UploadException("Ошибка при загрузке файла в S3", e);
         }
 
         return new UploadFileResponse(true);

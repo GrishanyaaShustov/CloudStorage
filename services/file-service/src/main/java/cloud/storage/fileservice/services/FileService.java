@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import java.security.Principal;
 
 public interface FileService {
-    UploadFileResponse uploadFile(UploadFileRequest request, Principal principal) throws SecurityException;
-    DeleteFileResponse deleteFile(DeleteFileRequest request, Principal principal) throws SecurityException;
-    GetFilesInDirectoryResponse getFiles(GetFilesInDirectoryRequest request, Principal principal) throws SecurityException;
-    ResponseEntity<InputStreamResource> downloadFileResponse(Long fileId, Principal principal) throws SecurityException;
+    UploadFileResponse uploadFile(UploadFileRequest request, Principal principal);
+    DeleteFileResponse deleteFile(DeleteFileRequest request, Principal principal);
+    GetFilesInDirectoryResponse getFiles(GetFilesInDirectoryRequest request, Principal principal);
+    ResponseEntity<InputStreamResource> downloadFileResponse(Long fileId, Principal principal);
 }

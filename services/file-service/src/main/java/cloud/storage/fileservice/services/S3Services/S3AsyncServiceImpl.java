@@ -1,7 +1,9 @@
 package cloud.storage.fileservice.services.S3Services;
 
 import cloud.storage.fileservice.configuration.S3Configuration;
+import cloud.storage.fileservice.customExceptions.S3UploadException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class S3AsyncServiceImpl implements S3AsyncService {
 
     private final S3Configuration s3Configuration;
@@ -48,7 +51,7 @@ public class S3AsyncServiceImpl implements S3AsyncService {
             String uploadId = createResp.uploadId();
 
             // 2Разбиваем поток DataBuffer на байтовые блоки
-            Flux<PartChunk> partFlux = chunkDataBuffers(dataStream, PART_SIZE)
+            Flux<PartChunk> partFlux = chunkDataBuffers(dataStream)
                     .index()
                     .map(tuple -> new PartChunk(tuple.getT1().intValue() + 1, tuple.getT2()));
 
@@ -88,14 +91,20 @@ public class S3AsyncServiceImpl implements S3AsyncService {
                             )
                     ))
                     // При ошибке — прерывание multipart upload
-                    .onErrorResume(ex -> Mono.fromFuture(() ->
-                            s3AsyncClient.abortMultipartUpload(AbortMultipartUploadRequest.builder()
-                                    .bucket(bucket)
-                                    .key(key)
-                                    .uploadId(uploadId)
-                                    .build()
-                            )
-                    ).then(Mono.error(new RuntimeException("Upload failed", ex))))
+                    .onErrorResume(ex -> {
+                        // Сначала прерываем загрузку
+                        return Mono.fromFuture(() ->
+                                        s3AsyncClient.abortMultipartUpload(
+                                                AbortMultipartUploadRequest.builder()
+                                                        .bucket(bucket)
+                                                        .key(key)
+                                                        .uploadId(uploadId)
+                                                        .build()
+                                        )
+                                )
+                                .doOnSuccess(r -> log.warn("Multipart upload aborted for key: {}", key))
+                                .then(Mono.error(new S3UploadException("S3 multipart upload failed", ex)));
+                    })
                     .then();
         });
     }
@@ -104,7 +113,7 @@ public class S3AsyncServiceImpl implements S3AsyncService {
     private record PartChunk(int partNumber, byte[] data) {}
 
     //  Реактивная агрегация DataBuffer в блоки заданного размера
-    private Flux<byte[]> chunkDataBuffers(Flux<DataBuffer> source, long chunkSize) {
+    private Flux<byte[]> chunkDataBuffers(Flux<DataBuffer> source) {
         return source
                 .publishOn(Schedulers.boundedElastic())
                 .flatMapSequential(buffer -> {
@@ -113,16 +122,16 @@ public class S3AsyncServiceImpl implements S3AsyncService {
                     DataBufferUtils.release(buffer);
                     return Flux.just(bytes);
                 })
-                .bufferUntil(accumulateOver(chunkSize))
+                .bufferUntil(accumulateOver())
                 .map(this::mergeBuffers);
     }
 
     //  Функция, чтобы разбивать поток, когда накопленный размер >= chunkSize
-    private java.util.function.Predicate<byte[]> accumulateOver(long chunkSize) {
+    private java.util.function.Predicate<byte[]> accumulateOver() {
         AtomicLong counter = new AtomicLong();
         return bytes -> {
             long current = counter.addAndGet(bytes.length);
-            if (current >= chunkSize) {
+            if (current >= S3AsyncServiceImpl.PART_SIZE) {
                 counter.set(0);
                 return true;
             }
