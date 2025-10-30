@@ -8,11 +8,13 @@ import cloud.storage.fileservice.repository.FileRepository;
 import cloud.storage.fileservice.repository.UserRepository;
 import cloud.storage.fileservice.repository.FolderRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class HelperService {
@@ -20,6 +22,8 @@ public class HelperService {
     private final UserRepository userRepository;
     private final FolderRepository folderRepository;
     private final FileRepository fileRepository;
+
+    private final Tika tika = new Tika();
 
     public User validateAndGetUser(Principal principal) {
         return userRepository.findUserByEmail(principal.getName())
@@ -62,4 +66,21 @@ public class HelperService {
     public String generateS3Key(String fileName) {
         return UUID.randomUUID() + "_" + fileName;
     }
+
+    public String detectMimeType(String fileName) {
+        try {
+            return tika.detect(fileName);
+        } catch (Exception e) {
+            return "application/octet-stream";
+        }
+    }
+
+    public String detectMimeType(MultipartFile file) {
+        try {
+            return tika.detect(file.getInputStream(), file.getOriginalFilename());
+        } catch (Exception e) {
+            return "application/octet-stream";
+        }
+    }
+
 }

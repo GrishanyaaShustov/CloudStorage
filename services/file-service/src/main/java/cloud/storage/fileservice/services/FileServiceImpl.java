@@ -1,14 +1,8 @@
 package cloud.storage.fileservice.services;
 
 import cloud.storage.fileservice.customExceptions.S3UploadException;
-import cloud.storage.fileservice.dto.requests.DeleteFileRequest;
-import cloud.storage.fileservice.dto.requests.GetFilesInDirectoryRequest;
-import cloud.storage.fileservice.dto.requests.MoveFileRequest;
-import cloud.storage.fileservice.dto.requests.UploadFileRequest;
-import cloud.storage.fileservice.dto.responses.DeleteFileResponse;
-import cloud.storage.fileservice.dto.responses.GetFilesInDirectoryResponse;
-import cloud.storage.fileservice.dto.responses.MoveFileResponse;
-import cloud.storage.fileservice.dto.responses.UploadFileResponse;
+import cloud.storage.fileservice.dto.requests.*;
+import cloud.storage.fileservice.dto.responses.*;
 import cloud.storage.fileservice.models.Folder;
 import cloud.storage.fileservice.models.User;
 import cloud.storage.fileservice.repository.FileRepository;
@@ -118,6 +112,43 @@ public class FileServiceImpl implements FileService {
         file.setFolder(targetFolder);
         fileRepository.save(file);
         return new MoveFileResponse("File moved to folder id: " + targetFolder.getId());
+    }
+
+    @Override
+    public RenameFileResponse renameFile(RenameFileRequest request, Principal principal) {
+        User user = helperService.validateAndGetUser(principal);
+        cloud.storage.fileservice.models.File file = helperService.validateAndGetFile(user, request.getFileId());
+
+        String oldName = file.getName(); // исходное имя файла
+        String newName = request.getNewName().trim();
+        helperService.validateFileNameUniq(user, file.getFolder(), newName);
+
+        // Разбираем старое имя на base + расширение
+        int oldDotIndex = oldName.lastIndexOf('.');
+        String oldExtension = oldDotIndex != -1 ? oldName.substring(oldDotIndex + 1) : "";
+
+        // Разбираем новое имя на base + расширение
+        int newDotIndex = newName.lastIndexOf('.');
+        String newBaseName = newDotIndex != -1 ? newName.substring(0, newDotIndex) : newName;
+        String newExtension = newDotIndex != -1 ? newName.substring(newDotIndex + 1) : "";
+
+        // Логика по смене расширения
+        if (!newExtension.isEmpty() && !newExtension.equalsIgnoreCase(oldExtension)) {
+            // Пользователь сменил расширение
+            file.setName(newName);
+            // Определяем новый MIME type через Tika
+            String mimeType = helperService.detectMimeType(newName);
+            file.setContentType(mimeType);
+        } else if (newExtension.isEmpty()) {
+            // Пользователь удалил расширение — сохраняем старое
+            file.setName(newBaseName + (oldExtension.isEmpty() ? "" : "." + oldExtension));
+        } else {
+            // Пользователь сменил только имя, расширение осталось
+            file.setName(newBaseName + (oldExtension.isEmpty() ? "" : "." + oldExtension));
+        }
+
+        fileRepository.save(file);
+        return new RenameFileResponse("File renamed successfully");
     }
 
     @Override

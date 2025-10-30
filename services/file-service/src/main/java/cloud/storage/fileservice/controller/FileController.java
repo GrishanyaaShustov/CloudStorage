@@ -1,13 +1,7 @@
 package cloud.storage.fileservice.controller;
 
-import cloud.storage.fileservice.dto.requests.DeleteFileRequest;
-import cloud.storage.fileservice.dto.requests.GetFilesInDirectoryRequest;
-import cloud.storage.fileservice.dto.requests.MoveFileRequest;
-import cloud.storage.fileservice.dto.requests.UploadFileRequest;
-import cloud.storage.fileservice.dto.responses.DeleteFileResponse;
-import cloud.storage.fileservice.dto.responses.GetFilesInDirectoryResponse;
-import cloud.storage.fileservice.dto.responses.MoveFileResponse;
-import cloud.storage.fileservice.dto.responses.UploadFileResponse;
+import cloud.storage.fileservice.dto.requests.*;
+import cloud.storage.fileservice.dto.responses.*;
 import cloud.storage.fileservice.services.FileService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -49,8 +43,20 @@ public class FileController {
             @RequestBody MoveFileRequest request,
             Principal principal
     ){
-       log.info("Запрос на перемещение файла пользователем {}", principal.getName());
-       return ResponseEntity.ok(fileService.moveFile(request, principal));
+        log.info("Запрос на перемещение файла пользователем {}", principal.getName());
+        return ResponseEntity.ok(fileService.moveFile(request, principal));
+    }
+
+    /**
+     * Скачивание файла
+     */
+    @PatchMapping("/rename")
+    public ResponseEntity<RenameFileResponse> renameFile(
+            @RequestBody RenameFileRequest request,
+            Principal principal
+    ){
+        log.info("Запрос на переименование файла пользователем {}", principal.getName());
+        return ResponseEntity.ok(fileService.renameFile(request, principal));
     }
 
     /**

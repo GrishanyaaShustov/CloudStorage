@@ -12,5 +12,6 @@ public interface FileService {
     DeleteFileResponse deleteFile(DeleteFileRequest request, Principal principal);
     GetFilesInDirectoryResponse getFiles(GetFilesInDirectoryRequest request, Principal principal);
     MoveFileResponse moveFile(MoveFileRequest request, Principal principal);
+    RenameFileResponse renameFile(RenameFileRequest request, Principal principal);
     ResponseEntity<InputStreamResource> downloadFileResponse(Long fileId, Principal principal);
 }
