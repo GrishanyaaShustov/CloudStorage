@@ -1,5 +1,6 @@
 package cloud.storage.fileservice.configuration;
 
+import cloud.storage.fileservice.configuration.jwt.JwtValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

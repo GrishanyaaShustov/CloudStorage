@@ -8,6 +8,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,6 +51,7 @@ public class JwtValidator extends OncePerRequestFilter {
                         .getBody();
 
                 String email = claims.get("email", String.class);
+                Long userId = claims.get("userId", Long.class);
                 String authorities = claims.get("authorities", String.class);
 
                 if (email == null) {
@@ -61,8 +63,10 @@ public class JwtValidator extends OncePerRequestFilter {
                         ? AuthorityUtils.commaSeparatedStringToAuthorityList(authorities)
                         : List.of();
 
+                CustomUserPrincipal principal = new CustomUserPrincipal(userId, email);
+
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(email, jwt, auths);
+                        new UsernamePasswordAuthenticationToken(principal, jwt, auths);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (JwtException e) {

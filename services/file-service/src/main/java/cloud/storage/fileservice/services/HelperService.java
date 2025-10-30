@@ -1,6 +1,6 @@
 package cloud.storage.fileservice.services;
 
-import cloud.storage.fileservice.configuration.CustomUserPrincipal;
+import cloud.storage.fileservice.configuration.jwt.CustomUserPrincipal;
 import cloud.storage.fileservice.customExceptions.*;
 import cloud.storage.fileservice.models.File;
 import cloud.storage.fileservice.models.Folder;
