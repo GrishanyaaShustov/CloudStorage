@@ -31,7 +31,7 @@ public class FileController {
             @RequestParam(name = "folderId", required = false) Long folderId,
             Principal principal
     ) {
-        log.info("Запрос на загрузку файла пользователем {}", principal.getName());
+        log.info("Request on uploading file by user {}", principal.getName());
         return ResponseEntity.ok(fileService.uploadFile(new UploadFileRequest(file, folderId), principal));
     }
 
@@ -43,7 +43,7 @@ public class FileController {
             @RequestBody CopyFileRequest request,
             Principal principal
     ){
-        log.info("Запрос на копирование файла пользователем {}", principal.getName());
+        log.info("Request on copy file by user {}", principal.getName());
         return ResponseEntity.ok(fileService.copyFile(request, principal));
     }
 
@@ -55,7 +55,7 @@ public class FileController {
             @RequestBody MoveFileRequest request,
             Principal principal
     ){
-        log.info("Запрос на перемещение файла пользователем {}", principal.getName());
+        log.info("Request on move file by user {}", principal.getName());
         return ResponseEntity.ok(fileService.moveFile(request, principal));
     }
 
@@ -67,7 +67,7 @@ public class FileController {
             @RequestBody RenameFileRequest request,
             Principal principal
     ){
-        log.info("Запрос на переименование файла пользователем {}", principal.getName());
+        log.info("Request on downloading file by user {}", principal.getName());
         return ResponseEntity.ok(fileService.renameFile(request, principal));
     }
 
@@ -79,7 +79,7 @@ public class FileController {
             @PathVariable Long fileId,
             Principal principal
     ) {
-        log.info("Запрос на удаление файла id={} пользователем {}", fileId, principal.getName());
+        log.info("Request on deleting file by user {}", principal.getName());
         return ResponseEntity.ok(fileService.deleteFile(new DeleteFileRequest(fileId), principal));
     }
 
@@ -91,7 +91,7 @@ public class FileController {
             @PathVariable Long folderId,
             Principal principal
     ) {
-        log.info("Запрос на получение файлов из папки {} пользователем {}", folderId, principal.getName());
+        log.info("Request on get files from folder {} by user {}", folderId, principal.getName());
         return ResponseEntity.ok(fileService.getFiles(new GetFilesInDirectoryRequest(folderId), principal));
     }
 
@@ -100,7 +100,7 @@ public class FileController {
      */
     @GetMapping
     public ResponseEntity<GetFilesInDirectoryResponse> getFiles(Principal principal) {
-        log.info("Запрос на получение файлов из корневой директории пользователем {}", principal.getName());
+        log.info("Request on get files from root folder by user {}", principal.getName());
         return ResponseEntity.ok(fileService.getFiles(new GetFilesInDirectoryRequest(null), principal));
     }
 
@@ -112,7 +112,7 @@ public class FileController {
             @PathVariable Long fileId,
             Principal principal
     ) {
-        log.info("Запрос на скачивание файла id={} пользователем {}", fileId, principal.getName());
+        log.info("Request on downloading file id={} by user {}", fileId, principal.getName());
         return fileService.downloadFileResponse(fileId, principal);
     }
 }

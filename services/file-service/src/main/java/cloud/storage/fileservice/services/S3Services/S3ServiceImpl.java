@@ -19,17 +19,6 @@ public class S3ServiceImpl implements S3Service{
     private final S3Configuration s3Configuration;
     private final S3Client s3Client;
 
-    // ---------- Обычная загрузка ----------
-    @Override
-    public void uploadFile(String key, InputStream stream, long size, String contentType) {
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(s3Configuration.getBucket())
-                .key(key)
-                .contentType(contentType)
-                .build();
-        s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(stream, size));
-    }
-
     @Override
     public void deleteFile(String key) {
         DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
