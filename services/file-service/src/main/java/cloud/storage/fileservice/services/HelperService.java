@@ -7,6 +7,7 @@ import cloud.storage.fileservice.models.Folder;
 import cloud.storage.fileservice.models.User;
 import cloud.storage.fileservice.repository.FileRepository;
 import cloud.storage.fileservice.repository.FolderRepository;
+import cloud.storage.fileservice.services.grpc.FolderGrpcClient;
 import lombok.RequiredArgsConstructor;
 import org.apache.tika.Tika;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,10 +21,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class HelperService {
 
-    private final FolderRepository folderRepository;
     private final FileRepository fileRepository;
 
     private final Tika tika = new Tika();
+    private final FolderGrpcClient folderGrpcClient;
 
     public User validateAndGetUser(Principal principal) {
         if (principal instanceof UsernamePasswordAuthenticationToken token &&
@@ -39,13 +40,23 @@ public class HelperService {
     public Folder validateAndGetFolder(User user, Long folderId) {
         if (folderId == null) return null;
 
-        Folder folder = folderRepository.findFolderById(folderId)
-                .orElseThrow(() -> new FolderNotFoundException("Folder does not exist"));
+        userservice.Folder.getFolderFolderDataResponse folderDataResponse = folderGrpcClient.getFolderData(folderId, user.getId());
+        if (folderDataResponse.getUserId() != user.getId()) throw new AccessDeniedException("Access denied to this folder");
 
-        if (!folder.getUser().getId().equals(user.getId()))
-            throw new AccessDeniedException("Access denied to this folder");
+        Folder.FolderBuilder folderBuilder = Folder.builder()
+                .id(folderDataResponse.getId())
+                .name(folderDataResponse.getName())
+                .user(user);
 
-        return folder;
+        if(folderDataResponse.getParentId() != 0){
+            Folder parent = Folder.builder()
+                    .id(folderDataResponse.getParentId())
+                    .build();
+            folderBuilder.parent(parent);
+        }
+
+        return folderBuilder.build();
+
     }
 
     public File validateAndGetFile(User user, Long fileId) {
