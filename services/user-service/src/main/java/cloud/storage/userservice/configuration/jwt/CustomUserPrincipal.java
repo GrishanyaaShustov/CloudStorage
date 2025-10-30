@@ -1,4 +1,4 @@
-package cloud.storage.userservice.configuration;
+package cloud.storage.userservice.configuration.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
