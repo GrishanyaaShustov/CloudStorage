@@ -6,7 +6,6 @@ import cloud.storage.fileservice.models.File;
 import cloud.storage.fileservice.models.Folder;
 import cloud.storage.fileservice.models.User;
 import cloud.storage.fileservice.repository.FileRepository;
-import cloud.storage.fileservice.repository.FolderRepository;
 import cloud.storage.fileservice.services.grpc.FolderGrpcClient;
 import lombok.RequiredArgsConstructor;
 import org.apache.tika.Tika;
@@ -40,7 +39,7 @@ public class HelperService {
     public Folder validateAndGetFolder(User user, Long folderId) {
         if (folderId == null) return null;
 
-        userservice.Folder.getFolderFolderDataResponse folderDataResponse = folderGrpcClient.getFolderData(folderId, user.getId());
+        userservice.Folder.GetFolderDataResponse folderDataResponse = folderGrpcClient.getFolderData(folderId, user.getId());
         if (folderDataResponse.getUserId() != user.getId()) throw new AccessDeniedException("Access denied to this folder");
 
         Folder.FolderBuilder folderBuilder = Folder.builder()

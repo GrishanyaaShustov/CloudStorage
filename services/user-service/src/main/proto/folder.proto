@@ -3,17 +3,18 @@ syntax = "proto3";
 package userservice;
 
 service FolderService {
-  rpc GetFolder(GetFolderRequest) returns (FolderResponse);
+  rpc GetFolderData(GetFolderDataRequest) returns (GetFolderDataResponse);
 }
 
-message GetFolderRequest {
+message GetFolderDataRequest {
   int64 folderId = 1;
   int64 userId = 2; // для проверки принадлежности
 }
 
-message FolderResponse {
+message GetFolderDataResponse {
   int64 id = 1;
   string name = 2;
   int64 parentId = 3; // null если нет
   int64 userId = 4;
+  string email = 5;
 }

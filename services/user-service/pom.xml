@@ -65,7 +65,7 @@
         <!-- Spring gRPC -->
         <dependency>
             <groupId>org.springframework.grpc</groupId>
-            <artifactId>spring-grpc-server-web-spring-boot-starter</artifactId>
+            <artifactId>spring-grpc-server-spring-boot-starter</artifactId>
             <version>${spring-grpc.version}</version>
         </dependency>
 
