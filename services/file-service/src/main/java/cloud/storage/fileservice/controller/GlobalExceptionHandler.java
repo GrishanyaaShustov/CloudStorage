@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -70,6 +71,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleAll(Exception ex) {
         log.error("Unexpected error at {}: {}", Instant.now(), ex.getMessage(), ex);
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred: " + ex.getMessage());
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNotFound(NoHandlerFoundException ex) {
+        log.warn("Endpoint not found at {}: {}", Instant.now(), ex.getRequestURL());
+        return buildResponse(HttpStatus.NOT_FOUND, "Endpoint not found: " + ex.getRequestURL());
     }
 
     // ====================== ВСПОМОГАТЕЛЬНЫЙ МЕТОД ======================

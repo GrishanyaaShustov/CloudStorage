@@ -34,6 +34,18 @@ spring:
       max-file-size: 1000MB
       max-request-size: 1000MB
 
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+
 jwt:
   key: "SEEEEEEEEEEEEEEEEEECREEEEEEEEEEEEEEEEEET"
   header: "Authorization"
+
+grpc:
+  client:
+    user-service:
+      address: "static://localhost:9090"
+      plaintext: true
