@@ -13,5 +13,6 @@ import java.util.Optional;
 public interface FolderRepository extends JpaRepository<Folder, Long> {
     @Query("SELECT f FROM Folder f JOIN FETCH f.user WHERE f.id = :id")
     Optional<Folder> findFolderById(@Param("id") Long id);
+
     boolean existsByNameAndParentAndUser(String name, Folder parent, User user);
 }

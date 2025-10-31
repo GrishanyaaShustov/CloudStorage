@@ -21,13 +21,22 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  servlet:
+    multipart:
+      max-file-size: 1000MB
+      max-request-size: 1000MB
+      enabled: true
+
+  grpc:
+    server:
+      port: 9090
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+
 jwt:
   key: "SUPER-VERY-SECRET-KEY-VERY-SECRET-VERY-VERY"
   header: "Authorization"
-
-storage:
-  grpc:
-    server:
-      host: storage-service
-      port: 9090
-      max-inbound-message-size: 209715200

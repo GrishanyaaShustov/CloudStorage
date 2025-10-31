@@ -1,7 +1,7 @@
 package cloud.storage.userservice.services.grpc;
 
-import cloud.storage.userservice.customExceptions.FolderAccessDeniedException;
-import cloud.storage.userservice.customExceptions.FolderNotFoundException;
+import cloud.storage.userservice.customExceptions.grpcExceptions.FolderAccessDeniedException;
+import cloud.storage.userservice.customExceptions.grpcExceptions.FolderNotFoundException;
 import cloud.storage.userservice.models.Folder;
 import cloud.storage.userservice.repository.FolderRepository;
 import io.grpc.Status;
