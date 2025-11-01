@@ -9,8 +9,8 @@ import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.grpc.server.service.GrpcService;
 import org.springframework.transaction.annotation.Transactional;
-import userservice.FolderServiceGrpc;
-import userservice.Folder.*;
+import folderservice.FolderServiceGrpc;
+import folderservice.Folder.*;
 
 @RequiredArgsConstructor
 @GrpcService
@@ -40,6 +40,7 @@ public class FolderGrpcServer extends FolderServiceGrpc.FolderServiceImplBase {
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+
         } catch (FolderNotFoundException e) {
             responseObserver.onError(
                     Status.NOT_FOUND.withDescription(e.getMessage()).asRuntimeException()
