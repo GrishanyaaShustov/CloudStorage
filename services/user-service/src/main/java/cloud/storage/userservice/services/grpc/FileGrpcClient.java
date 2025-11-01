@@ -1,6 +1,6 @@
 package cloud.storage.userservice.services.grpc;
 
-import cloud.storage.userservice.customExceptions.grpcExceptions.FileNotFoundException;
+import cloud.storage.userservice.customExceptions.grpcExceptions.GrpcFileNotFoundException;
 import cloud.storage.userservice.customExceptions.grpcExceptions.GrpcAccessDeniedException;
 import fileservice.FileServiceGrpc;
 import io.grpc.Status;
@@ -30,7 +30,7 @@ public class FileGrpcClient {
             switch (code) {
                 case NOT_FOUND -> {
                     log.warn("File not found (id={}): {}", fileId, e.getMessage());
-                    throw new FileNotFoundException("File not found");
+                    throw new GrpcFileNotFoundException("File not found");
                 }
                 case PERMISSION_DENIED -> {
                     log.warn("Access denied to file (id={}): {}", fileId, e.getMessage());

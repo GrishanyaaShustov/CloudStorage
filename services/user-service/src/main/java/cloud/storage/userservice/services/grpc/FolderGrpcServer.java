@@ -2,7 +2,7 @@ package cloud.storage.userservice.services.grpc;
 
 import cloud.storage.userservice.configuration.grpc.GrpcServerInterceptor;
 import cloud.storage.userservice.customExceptions.grpcExceptions.GrpcAccessDeniedException;
-import cloud.storage.userservice.customExceptions.grpcExceptions.FileNotFoundException;
+import cloud.storage.userservice.customExceptions.grpcExceptions.GrpcFolderNotFoundException;
 import cloud.storage.userservice.models.Folder;
 import cloud.storage.userservice.repository.FolderRepository;
 import io.grpc.Status;
@@ -27,7 +27,7 @@ public class FolderGrpcServer extends FolderServiceGrpc.FolderServiceImplBase {
             // Получаем userId из контекста (установленного серверным перехватчиком)
             Long userId = GrpcServerInterceptor.USER_ID_CTX_KEY.get();
 
-            Folder folder = folderRepository.findFolderById(folderId).orElseThrow(() -> new FileNotFoundException("Folder not found"));
+            Folder folder = folderRepository.findFolderById(folderId).orElseThrow(() -> new GrpcFolderNotFoundException("Folder not found"));
             if (!folder.getUser().getId().equals(userId)) {
                 responseObserver.onError(
                         Status.PERMISSION_DENIED.withDescription("Access denied").asRuntimeException()
@@ -44,7 +44,7 @@ public class FolderGrpcServer extends FolderServiceGrpc.FolderServiceImplBase {
             responseObserver.onNext(response);
             responseObserver.onCompleted();
 
-        } catch (FileNotFoundException e) {
+        } catch (GrpcFolderNotFoundException e) {
             responseObserver.onError(
                     Status.NOT_FOUND.withDescription(e.getMessage()).asRuntimeException()
             );
