@@ -41,7 +41,7 @@ public class HelperService {
     public Folder validateAndGetFolder(User user, Long folderId) {
         if (folderId == null) return null;
 
-        GetFolderDataResponse folderDataResponse = folderGrpcClient.getFolderData(folderId, user.getId());
+        GetFolderDataResponse folderDataResponse = folderGrpcClient.getFolderData(folderId);
         if (folderDataResponse.getUserId() != user.getId()) throw new AccessDeniedException("Access denied to this folder");
 
         Folder.FolderBuilder folderBuilder = Folder.builder()

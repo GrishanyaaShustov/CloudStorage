@@ -1,5 +1,6 @@
 package cloud.storage.userservice.services.grpc;
 
+import cloud.storage.userservice.configuration.grpc.GrpcServerInterceptor;
 import cloud.storage.userservice.customExceptions.grpcExceptions.FolderAccessDeniedException;
 import cloud.storage.userservice.customExceptions.grpcExceptions.FolderNotFoundException;
 import cloud.storage.userservice.models.Folder;
@@ -13,7 +14,7 @@ import folderservice.FolderServiceGrpc;
 import folderservice.Folder.*;
 
 @RequiredArgsConstructor
-@GrpcService
+@GrpcService(interceptors = GrpcServerInterceptor.class)
 public class FolderGrpcServer extends FolderServiceGrpc.FolderServiceImplBase {
     private final FolderRepository folderRepository;
 
@@ -22,7 +23,9 @@ public class FolderGrpcServer extends FolderServiceGrpc.FolderServiceImplBase {
     public void getFolderData(GetFolderDataRequest request, StreamObserver<GetFolderDataResponse> responseObserver) {
         try {
             Long folderId = request.getFolderId();
-            Long userId = request.getUserId();
+
+            // Получаем userId из контекста (установленного серверным перехватчиком)
+            Long userId = GrpcServerInterceptor.USER_ID_CTX_KEY.get();
 
             Folder folder = folderRepository.findFolderById(folderId).orElseThrow(() -> new FolderNotFoundException("Folder not found"));
             if (!folder.getUser().getId().equals(userId)) {

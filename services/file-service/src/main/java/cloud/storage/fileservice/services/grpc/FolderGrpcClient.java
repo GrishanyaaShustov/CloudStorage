@@ -17,10 +17,9 @@ public class FolderGrpcClient {
 
     private final FolderServiceGrpc.FolderServiceBlockingStub folderStub;
 
-    public GetFolderDataResponse getFolderData(Long folderId, Long userId) {
+    public GetFolderDataResponse getFolderData(Long folderId) {
         GetFolderDataRequest request = GetFolderDataRequest.newBuilder()
                 .setFolderId(folderId)
-                .setUserId(userId)
                 .build();
 
         try {
@@ -35,7 +34,7 @@ public class FolderGrpcClient {
                     throw new FolderNotFoundException("Folder not found");
                 }
                 case PERMISSION_DENIED -> {
-                    log.warn("Access denied to folder (id={}, userId={}): {}", folderId, userId, e.getMessage());
+                    log.warn("Access denied to folder (id={}): {}", folderId, e.getMessage());
                     throw new AccessDeniedException("Access denied to this folder");
                 }
                 default -> {

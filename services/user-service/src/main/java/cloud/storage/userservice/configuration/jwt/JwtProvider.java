@@ -1,4 +1,4 @@
-package cloud.storage.fileservice.configuration.jwt;
+package cloud.storage.userservice.configuration.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
