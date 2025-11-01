@@ -40,6 +40,10 @@ spring:
     resources:
       add-mappings: false
 
+  grpc:
+    server:
+      port: 9091
+
 jwt:
   key: "SEEEEEEEEEEEEEEEEEECREEEEEEEEEEEEEEEEEET"
   header: "Authorization"
