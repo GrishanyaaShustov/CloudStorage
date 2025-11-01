@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package userservice;
+package folderservice;
 
 service FolderService {
   rpc GetFolderData(GetFolderDataRequest) returns (GetFolderDataResponse);
@@ -16,5 +16,4 @@ message GetFolderDataResponse {
   string name = 2;
   int64 parentId = 3; // null если нет
   int64 userId = 4;
-  string email = 5;
 }

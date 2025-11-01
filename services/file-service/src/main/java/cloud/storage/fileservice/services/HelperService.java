@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
 import java.util.UUID;
 
+import folderservice.Folder.*;
+
 @Service
 @RequiredArgsConstructor
 public class HelperService {
@@ -39,7 +41,7 @@ public class HelperService {
     public Folder validateAndGetFolder(User user, Long folderId) {
         if (folderId == null) return null;
 
-        userservice.Folder.GetFolderDataResponse folderDataResponse = folderGrpcClient.getFolderData(folderId, user.getId());
+        GetFolderDataResponse folderDataResponse = folderGrpcClient.getFolderData(folderId, user.getId());
         if (folderDataResponse.getUserId() != user.getId()) throw new AccessDeniedException("Access denied to this folder");
 
         Folder.FolderBuilder folderBuilder = Folder.builder()
@@ -90,13 +92,4 @@ public class HelperService {
             return "application/octet-stream";
         }
     }
-
-    public String detectMimeType(MultipartFile file) {
-        try {
-            return tika.detect(file.getInputStream(), file.getOriginalFilename());
-        } catch (Exception e) {
-            return "application/octet-stream";
-        }
-    }
-
 }

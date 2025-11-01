@@ -7,8 +7,8 @@ import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import userservice.Folder;
-import userservice.FolderServiceGrpc;
+import folderservice.Folder.*;
+import folderservice.FolderServiceGrpc;
 
 @Slf4j
 @Service
@@ -17,8 +17,8 @@ public class FolderGrpcClient {
 
     private final FolderServiceGrpc.FolderServiceBlockingStub folderStub;
 
-    public Folder.GetFolderDataResponse getFolderData(Long folderId, Long userId) {
-        Folder.GetFolderDataRequest request = Folder.GetFolderDataRequest.newBuilder()
+    public GetFolderDataResponse getFolderData(Long folderId, Long userId) {
+        GetFolderDataRequest request = GetFolderDataRequest.newBuilder()
                 .setFolderId(folderId)
                 .setUserId(userId)
                 .build();

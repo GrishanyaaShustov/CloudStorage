@@ -4,7 +4,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import userservice.FolderServiceGrpc;
+import folderservice.FolderServiceGrpc;
 
 @Configuration
 public class GrpcConfiguration {
