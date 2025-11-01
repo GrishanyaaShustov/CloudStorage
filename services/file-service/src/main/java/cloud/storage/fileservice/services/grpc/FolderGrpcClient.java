@@ -1,7 +1,7 @@
 package cloud.storage.fileservice.services.grpc;
 
-import cloud.storage.fileservice.customExceptions.AccessDeniedException;
-import cloud.storage.fileservice.customExceptions.FolderNotFoundException;
+import cloud.storage.fileservice.customExceptions.grpcExceptions.GrpcAccessDeniedException;
+import cloud.storage.fileservice.customExceptions.grpcExceptions.GrpcFolderNotFoundException;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +31,11 @@ public class FolderGrpcClient {
             switch (code) {
                 case NOT_FOUND -> {
                     log.warn("Folder not found (id={}): {}", folderId, e.getMessage());
-                    throw new FolderNotFoundException("Folder not found");
+                    throw new GrpcFolderNotFoundException("Folder not found");
                 }
                 case PERMISSION_DENIED -> {
                     log.warn("Access denied to folder (id={}): {}", folderId, e.getMessage());
-                    throw new AccessDeniedException("Access denied to this folder");
+                    throw new GrpcAccessDeniedException("Access denied to this folder");
                 }
                 default -> {
                     log.error("Unexpected gRPC error: {}", e.getMessage(), e);

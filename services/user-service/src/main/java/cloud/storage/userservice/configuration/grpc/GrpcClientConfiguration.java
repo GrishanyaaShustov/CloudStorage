@@ -1,6 +1,6 @@
 package cloud.storage.userservice.configuration.grpc;
 
-import folderservice.FolderServiceGrpc;
+import fileservice.FileServiceGrpc;
 import io.grpc.Channel;
 import io.grpc.ClientInterceptors;
 import io.grpc.ManagedChannel;
@@ -26,7 +26,7 @@ public class GrpcClientConfiguration {
     }
 
     @Bean
-    public FolderServiceGrpc.FolderServiceBlockingStub folderServiceStub(Channel channel) {
-        return FolderServiceGrpc.newBlockingStub(channel);
+    public FileServiceGrpc.FileServiceBlockingStub fileServiceStub(Channel channel) {
+        return FileServiceGrpc.newBlockingStub(channel);
     }
 }
